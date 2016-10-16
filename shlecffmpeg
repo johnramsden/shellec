@@ -51,32 +51,36 @@ echo "Input video: ${video_input}"
 echo "Input filter: ${filter}"
 }
 
+run_build(){
+  echo "Starting ffmpeg"
+  # Create background
+  ffmpeg -loop 1 -i ${background} \
+    -c:v libx264 -t ${intro_length} -pix_fmt yuvj444p  -f mpegts intermediate1.ts && \
+  # Create intro with silent audio "-f lavfi -i aevalsrc=0 -i"
+  ffmpeg -f lavfi -i aevalsrc=0 -i intermediate1.ts -filter_complex \
+      "drawtext=${class_drawtext}: \
+      fontfile=${font_file}: \
+      text=${class_name}: fontcolor=white: fontsize=148: box=1: boxcolor=black@0.5: \
+      boxborderw=25: x=(w-text_w)/2:
+      \ y=(h-text_h)/2[firsttitle];[firsttitle]drawtext=${lecture_drawtext}: \
+      fontfile=/usr/share/fonts/TTF/WorkSans-Bold.ttf: text=${lecture_name}: \
+      fontcolor=white: fontsize=148: box=1: boxcolor=black@0.5: boxborderw=25:
+      \ x=(w-text_w)/2: y=(h-text_h)/2" \
+      -codec:a copy -acodec aac -shortest intro_output.mp4 && \
+
+  # Concat video
+  ffmpeg -i intro_output.mp4 \
+    ${video_input[@]} \
+    -filter_complex "[0:v:0][0:a:0]${filter}concat=n=${vidnum}:v=1:a=1[v][a]" \
+    -map "[v]" -map "[a]" \
+    "${output_path}/${name}.mp4"
+
+  rm intermediate1.ts intro_output.mp4
+}
+
 input_videos ${videos}
+run_build
 
-echo "Starting ffmpeg"
-# Create background
-ffmpeg -loop 1 -i ${background} \
-  -c:v libx264 -t ${intro_length} -pix_fmt yuvj444p  -f mpegts intermediate1.ts && \
-# Create intro with silent audio "-f lavfi -i aevalsrc=0 -i"
-ffmpeg -f lavfi -i aevalsrc=0 -i intermediate1.ts -filter_complex \
-    "drawtext=${class_drawtext}: \
-    fontfile=${font_file}: \
-    text=${class_name}: fontcolor=white: fontsize=148: box=1: boxcolor=black@0.5: \
-    boxborderw=25: x=(w-text_w)/2:
-    \ y=(h-text_h)/2[firsttitle];[firsttitle]drawtext=${lecture_drawtext}: \
-    fontfile=/usr/share/fonts/TTF/WorkSans-Bold.ttf: text=${lecture_name}: \
-    fontcolor=white: fontsize=148: box=1: boxcolor=black@0.5: boxborderw=25:
-    \ x=(w-text_w)/2: y=(h-text_h)/2" \
-    -codec:a copy -acodec aac -shortest intro_output.mp4 && \
-
-# Concat video
-ffmpeg -i intro_output.mp4 \
-  ${video_input[@]} \
-  -filter_complex "${filter}concat=n=${vidnum}:v=1:a=1[v][a]" \
-  -map "[v]" -map "[a]" \
-  "${output_path}/${name}.mp4"
-
-rm intermediate1.ts intro_output.mp4
 
 echo
 echo "##########################################"
