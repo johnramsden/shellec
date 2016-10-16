@@ -35,6 +35,9 @@ echo "${vidnum} videos sourced from ${video_dir}:"
 echo "${videos}"
 echo "##########################################"
 
+# Add intro
+vidnum=`expr ${vidnum} + 1`
+
 video_input=""
 filter=""
 
@@ -73,7 +76,7 @@ run_build(){
     ${video_input[@]} \
     -filter_complex "[0:v:0][0:a:0]${filter}concat=n=${vidnum}:v=1:a=1[v][a]" \
     -map "[v]" -map "[a]" \
-    "${output_path}/${name}.mp4"
+    "${name}.mp4"
 
   rm intermediate1.ts intro_output.mp4
 }
