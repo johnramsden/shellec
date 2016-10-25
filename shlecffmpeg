@@ -20,7 +20,7 @@ background="${3}"
 # directory containing named videos
 video_dir="${4}"
 
-# Specify output, if not given, default 'output' in current directory
+# Specify outputpath
 output_path="${5}"
 
 class_drawtext="enable=""'""between(t,${class_name_start},${class_name_end})""'"""
@@ -83,7 +83,7 @@ run_build(){
 
 input_videos ${videos}
 run_build
-
+mv "${name}.mp4" "${output_path}"
 
 echo
 echo "##########################################"
