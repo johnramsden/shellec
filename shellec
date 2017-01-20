@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Shell script to convert a series of clips from a lecture into
+# Shell script using ffmpeg to convert a series of clips from a lecture into
 # a single video with an intro showing the name of the lecture and the name of the class.
 
 intro_length="10"
