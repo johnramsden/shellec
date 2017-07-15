@@ -1,5 +1,8 @@
 #!/bin/sh
 
+# shellec v1.0
+# John Ramsden, 2017
+
 # Shell script using ffmpeg to convert a series of clips from a lecture into
 # a single video with an intro showing the name of the lecture and the name of the class.
 
